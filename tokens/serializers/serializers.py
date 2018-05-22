@@ -14,3 +14,8 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
         fields = ('name', 'details', 'lat', 'lon', 'date')
+
+
+class CodesCreateSerializer(serializers.Serializer):
+    amount = serializers.IntegerField()
+    worth = serializers.IntegerField()
