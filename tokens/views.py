@@ -8,6 +8,7 @@ from tokens.serializers.serializers import PromoCodeSerializer, EventSerializer,
 from tokens.mixins import LoginRequiredMixin, CreateListMixin
 from rest_framework import authentication, permissions
 from tokens.promo_codes import GeneratePromoCodes
+from django.contrib.gis.geos import Polygon, LineString
 
 # Create your views here.
 
@@ -48,8 +49,12 @@ class PromoCodeRetrieveApiView(LoginRequiredMixin, RetrieveAPIView):
             event_lat = PromoCode.objects.filter(code=code).get().event.lat
             radius_from_event = GeneratePromoCodes.haversine(event_lon, event_lat, origin_lon, origin_lat)
             if radius_from_event < PromoCode.objects.filter(code=code).get().radius:
-
-                return self.retrieve(PromoCode.objects.filter(code=code))
+                pl = LineString((origin_lat, origin_lon), (event_lat, event_lat))
+                serializer = PromoCodeSerializer(self.get_object())
+                return Response({
+                    'result': serializer.data,
+                    'lines': list(pl)
+                })
             else:
                 return Response({"Error": "too far from event to use the promo code"},
                                 status=status.HTTP_204_NO_CONTENT)
