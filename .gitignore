@@ -1,2 +1,4 @@
 .idea/*
 safeboda/__pycache__/*.*
+tokens/__pycache__/*
+tokens/migrations/__pycache__/*
