@@ -51,14 +51,18 @@ class PromoCodesList(LoginRequiredMixin, APIView):
     #     return Response(usernames)
 
     def post(self, request, format=None):
-        serializer1 = CodesCreateSerializer(data=request.data)
+        serializer = CodesCreateSerializer(data=request.data)
 
-        if serializer1.is_valid():
-            number_of_promo_codes = request.data["amount"] / request.data["worth"]
+        if serializer.is_valid():
+            number_of_promo_codes = request.data["amount"] / request.data["value_of_code"]
+            event = Events.objects.filter(name__exact=request.data["event"])
             code_generator = GeneratePromoCodes()
-            promo_codes = []
+
             for i in range(int(number_of_promo_codes)):
-                promo_codes.append(code_generator.promo_code())
-            # serializer.save()
-            return Response(promo_codes, status=status.HTTP_201_CREATED)
-        return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
+                promo = PromoCode(code=code_generator.promo_code(), amount=request.data["value_of_code"], active=True,
+                                  event=event,
+                                  radius=request.data["radius"])
+                promo.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
