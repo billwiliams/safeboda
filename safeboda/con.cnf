@@ -1,0 +1,6 @@
+[client]
+
+database = safeboda
+user = root
+password= eee8200
+default-character-set = utf8
