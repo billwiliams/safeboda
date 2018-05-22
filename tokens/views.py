@@ -6,6 +6,7 @@ from rest_framework import status
 from tokens.serializers.serializers import PromoCodeSerializer, EventSerializer, CodesCreateSerializer
 from tokens.mixins import LoginRequiredMixin, CreateListMixin
 from rest_framework import authentication, permissions
+from tokens.promo_codes import GeneratePromoCodes
 
 # Create your views here.
 
@@ -50,8 +51,14 @@ class PromoCodesList(LoginRequiredMixin, APIView):
     #     return Response(usernames)
 
     def post(self, request, format=None):
-        serializer = CodesCreateSerializer(data=request.data)
-        if serializer.is_valid():
+        serializer1 = CodesCreateSerializer(data=request.data)
+
+        if serializer1.is_valid():
+            number_of_promo_codes = request.data["amount"] / request.data["worth"]
+            code_generator = GeneratePromoCodes()
+            promo_codes = []
+            for i in range(int(number_of_promo_codes)):
+                promo_codes.append(code_generator.promo_code())
             # serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(promo_codes, status=status.HTTP_201_CREATED)
+        return Response(serializer1.errors, status=status.HTTP_400_BAD_REQUEST)
