@@ -28,7 +28,6 @@ class PromoCode(models.Model):
     id = models.AutoField(primary_key=True)
     code = models.CharField(max_length=45, blank=True, null=True, unique=True)
     active = models.BooleanField(default=False)
-    expired = models.BooleanField(default=False)
     radius = models.FloatField(default=10)  # radius from destination/origin default to 10km
     amount = models.FloatField(default=10)  # Amount worth of the promo code
     event = models.ForeignKey('Events', models.DO_NOTHING, null=False)
