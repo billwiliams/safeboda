@@ -12,7 +12,7 @@ from tokens.promo_codes import GeneratePromoCodes
 # Create your views here.
 
 from tokens.models import Events, PromoCode
-from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView
 
 
 class ActivePromoCodesListApiView(LoginRequiredMixin, ListAPIView):
@@ -33,6 +33,29 @@ class PromoCodeUpdateApiView(LoginRequiredMixin, UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
+
+class PromoCodeRetrieveApiView(LoginRequiredMixin, RetrieveAPIView):
+    queryset = PromoCode.objects.all()
+    lookup_field = 'code'
+    serializer_class = PromoCodeSerializer
+
+    def get(self, request, code, format=None, **kwargs):
+        try:
+            origin_lat = float(kwargs['origin_lat'])
+            origin_lon = float(kwargs['origin_lon'])
+            event_lon = PromoCode.objects.filter(code=code).get().event.lon
+            event_lat = PromoCode.objects.filter(code=code).get().event.lat
+            radius_from_event = GeneratePromoCodes.haversine(event_lon, event_lat, origin_lon, origin_lat)
+            if radius_from_event < PromoCode.objects.filter(code=code).get().radius:
+
+                return self.retrieve(PromoCode.objects.filter(code=code))
+            else:
+                return Response({"Error": "too far from event to use the promo code"},
+                                status=status.HTTP_204_NO_CONTENT)
+
+        except PromoCode.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class PromoCodeRadiusUpdateApiView(LoginRequiredMixin, UpdateAPIView):
