@@ -7,13 +7,19 @@ class PromoCodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PromoCode
-        fields = ('event', 'code', 'amount', 'active')
+        fields = ('event', 'code', 'amount', 'active', 'radius')
 
 
 class PromoCodeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoCode
         fields = ('active',)
+
+
+class PromoCodeRadiusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromoCode
+        fields = ('radius',)
 
 
 class EventSerializer(serializers.ModelSerializer):

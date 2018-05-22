@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from tokens.serializers.serializers import PromoCodeSerializer, EventSerializer, CodesCreateSerializer, \
-    PromoCodeUpdateSerializer
+    PromoCodeUpdateSerializer, PromoCodeRadiusUpdateSerializer
 from tokens.mixins import LoginRequiredMixin, CreateListMixin
 from rest_framework import authentication, permissions
 from tokens.promo_codes import GeneratePromoCodes
@@ -30,6 +30,15 @@ class PromoCodeUpdateApiView(LoginRequiredMixin, UpdateAPIView):
     queryset = PromoCode.objects.all()
     lookup_field = 'code'
     serializer_class = PromoCodeUpdateSerializer
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
+class PromoCodeRadiusUpdateApiView(LoginRequiredMixin, UpdateAPIView):
+    queryset = PromoCode.objects.all()
+    lookup_field = 'code'
+    serializer_class = PromoCodeRadiusUpdateSerializer
 
     def perform_update(self, serializer):
         serializer.save()
