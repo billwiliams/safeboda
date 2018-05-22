@@ -10,6 +10,12 @@ class PromoCodeSerializer(serializers.ModelSerializer):
         fields = ('event', 'code', 'amount', 'active')
 
 
+class PromoCodeUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromoCode
+        fields = ('active',)
+
+
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
@@ -17,7 +23,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class CodesCreateSerializer(serializers.Serializer):
-    amount = serializers.IntegerField() # amount of promo codes to give
-    value_of_code = serializers.IntegerField() # value of each promo code
+    amount = serializers.IntegerField()  # amount of promo codes to give
+    value_of_code = serializers.IntegerField()  # value of each promo code
     radius = serializers.IntegerField()
     event = serializers.CharField(max_length=40)

@@ -3,7 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from tokens.serializers.serializers import PromoCodeSerializer, EventSerializer, CodesCreateSerializer
+from tokens.serializers.serializers import PromoCodeSerializer, EventSerializer, CodesCreateSerializer, \
+    PromoCodeUpdateSerializer
 from tokens.mixins import LoginRequiredMixin, CreateListMixin
 from rest_framework import authentication, permissions
 from tokens.promo_codes import GeneratePromoCodes
@@ -11,7 +12,7 @@ from tokens.promo_codes import GeneratePromoCodes
 # Create your views here.
 
 from tokens.models import Events, PromoCode
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
 
 
 class ActivePromoCodesListApiView(LoginRequiredMixin, ListAPIView):
@@ -21,14 +22,14 @@ class ActivePromoCodesListApiView(LoginRequiredMixin, ListAPIView):
 
 class PromoCodesListApiView(LoginRequiredMixin, ListAPIView):
     queryset = PromoCode.objects.order_by('-id').all()
+
     serializer_class = PromoCodeSerializer
 
 
-class PromoCodeCreateApiView(LoginRequiredMixin, CreateAPIView):
-    serializer_class = PromoCodeSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
+class PromoCodeUpdateApiView(LoginRequiredMixin, UpdateAPIView):
+    queryset = PromoCode.objects.all()
+    lookup_field = 'code'
+    serializer_class = PromoCodeUpdateSerializer
 
     def perform_update(self, serializer):
         serializer.save()
