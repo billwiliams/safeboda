@@ -15,14 +15,22 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 
 
 class ActivePromoCodesListApiView(LoginRequiredMixin, ListAPIView):
-    queryset = PromoCode.objects.order_by('-id')
+    queryset = PromoCode.objects.filter(active=True).order_by('-id')
     serializer_class = PromoCodeSerializer
 
 
-class PromoCodesCreateApiView(LoginRequiredMixin, CreateAPIView):
+class PromoCodesListApiView(LoginRequiredMixin, ListAPIView):
+    queryset = PromoCode.objects.order_by('-id').all()
+    serializer_class = PromoCodeSerializer
+
+
+class PromoCodeCreateApiView(LoginRequiredMixin, CreateAPIView):
     serializer_class = PromoCodeSerializer
 
     def perform_create(self, serializer):
+        serializer.save()
+
+    def perform_update(self, serializer):
         serializer.save()
 
 
@@ -55,7 +63,10 @@ class PromoCodesList(LoginRequiredMixin, APIView):
 
         if serializer.is_valid():
             number_of_promo_codes = request.data["amount"] / request.data["value_of_code"]
-            event = Events.objects.filter(name__exact=request.data["event"])
+            event = Events.objects.filter(name__exact=request.data["event"]).first()
+            if not event:
+                return Response({"Message": "associated event doesnt exist"}, status=status.HTTP_400_BAD_REQUEST)
+
             code_generator = GeneratePromoCodes()
 
             for i in range(int(number_of_promo_codes)):
